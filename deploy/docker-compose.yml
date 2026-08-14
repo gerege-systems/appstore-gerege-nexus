@@ -124,8 +124,10 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
+    # 3013 is the standalone store's web and 3014 the developer console; this
+    # host runs several products and the ports are first-come.
     ports:
-      - "127.0.0.1:3014:3000"
+      - "127.0.0.1:3015:3000"
     depends_on:
       backend:
         condition: service_healthy
