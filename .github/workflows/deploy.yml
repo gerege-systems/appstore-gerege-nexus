@@ -1,0 +1,97 @@
+name: Deploy
+
+# The App Store, rolled out to its own host.
+#
+# Manual only. A store publishes a signed catalogue that every instance in the
+# field pins the key of, so putting a new one in front of them is a decision
+# somebody makes, not something a merge does.
+#
+# The image is built **on the host** rather than in CI and pulled. Two reasons,
+# both learned the hard way on this stack: an image built on a developer's
+# arm64 machine and copied here died with `exec format error`, and a pull of a
+# freshly pushed private image was refused by the registry while the rollout
+# was already tearing containers down. Building where it runs removes both, and
+# the host has the cores to spare.
+#
+# Required secrets:
+#   APPSTORE_DEPLOY_HOST     the host this product runs on
+#   APPSTORE_DEPLOY_SSH_KEY  a key that reaches it
+#   DEPLOY_USER              defaults to root
+
+on:
+  workflow_dispatch:
+    inputs:
+      rebuild_shell:
+        description: "Rebuild the platform shell too (slower; needed when the core moves)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: appstore-host-rollout
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Roll out
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the deployment secrets
+        id: guard
+        run: |
+          if [ -z "${{ secrets.APPSTORE_DEPLOY_HOST }}" ] || [ -z "${{ secrets.APPSTORE_DEPLOY_SSH_KEY }}" ]; then
+            echo "::error::APPSTORE_DEPLOY_HOST and APPSTORE_DEPLOY_SSH_KEY must be set"
+            exit 1
+          fi
+
+      - name: Build and restart
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          REBUILD_SHELL: ${{ inputs.rebuild_shell }}
+        with:
+          host: ${{ secrets.APPSTORE_DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER || 'root' }}
+          key: ${{ secrets.APPSTORE_DEPLOY_SSH_KEY }}
+          envs: REBUILD_SHELL
+          script: |
+            set -euo pipefail
+            root=/opt/appstore-nexus
+
+            # This product.
+            git -C "$root/src" fetch -q origin main
+            git -C "$root/src" reset -q --hard origin/main
+            docker build -q -f "$root/src/deploy/Dockerfile" \
+              -t appstore-nexus:latest "$root/src" >/dev/null
+
+            # The platform shell, built from the core repository for this
+            # origin. The API address is compiled into the bundle, so the
+            # published core image cannot be reused — see lib/apiBase.ts in the
+            # core: it asks its own host, which is what makes this build the
+            # only per-origin thing left.
+            if [ "${REBUILD_SHELL}" = "true" ]; then
+              git -C "$root/core" fetch -q origin main
+              git -C "$root/core" reset -q --hard origin/main
+              docker build -q -f "$root/core/frontend/Dockerfile" \
+                --build-arg NEXT_PUBLIC_ENVIRONMENT=production \
+                -t appstore-nexus-web:latest "$root/core/frontend" >/dev/null
+            fi
+
+            cp "$root/.env" "$root/src/deploy/.env"
+            cd "$root/src/deploy"
+            docker compose up -d
+
+            # The migrate service runs to completion before the API starts, so
+            # a healthy backend already means the schema moved with it.
+            for i in $(seq 1 30); do
+              if curl -fsS http://127.0.0.1:8087/health >/dev/null 2>&1; then
+                echo "backend healthy"
+                curl -fsS http://127.0.0.1:8087/ready >/dev/null && echo "database reachable"
+                exit 0
+              fi
+              sleep 5
+            done
+            echo "::error::the backend did not become healthy within 150s"
+            docker compose logs --tail=80 backend migrate
+            exit 1

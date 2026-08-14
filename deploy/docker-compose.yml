@@ -50,7 +50,7 @@ services:
       retries: 5
 
   migrate:
-    image: ${IMAGE:-appstore-nexus:v1}
+    image: ${IMAGE:-appstore-nexus:latest}
     container_name: gerege_appstore_nexus_migrate
     # The platform's migrations, from the core version this product's go.mod
     # pins — the image carries both, so they cannot drift apart.
@@ -63,7 +63,7 @@ services:
     restart: "no"
 
   backend:
-    image: ${IMAGE:-appstore-nexus:v1}
+    image: ${IMAGE:-appstore-nexus:latest}
     container_name: gerege_appstore_nexus_backend
     restart: unless-stopped
     environment:
@@ -119,7 +119,7 @@ services:
   # built for nexus.gerege.mn. So it is built here, from the core repository, for
   # this origin. That is the one thing about the frontend a distribution owns.
   web:
-    image: ${WEB_IMAGE:-appstore-nexus-web:v2}
+    image: ${WEB_IMAGE:-appstore-nexus-web:latest}
     container_name: gerege_appstore_nexus_web
     restart: unless-stopped
     environment:
