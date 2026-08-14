@@ -119,7 +119,7 @@ services:
   # built for nexus.gerege.mn. So it is built here, from the core repository, for
   # this origin. That is the one thing about the frontend a distribution owns.
   web:
-    image: ${WEB_IMAGE:-appstore-nexus-web:v1}
+    image: ${WEB_IMAGE:-appstore-nexus-web:v2}
     container_name: gerege_appstore_nexus_web
     restart: unless-stopped
     environment:
