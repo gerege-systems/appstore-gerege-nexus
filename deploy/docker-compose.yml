@@ -110,6 +110,26 @@ services:
       retries: 5
       start_period: 20s
 
+  # The platform's own shell, unmodified.
+  #
+  # A distribution does not fork the frontend: the sidebar, the store screens and
+  # the publisher studio are all catalogue-driven, so the generic shell already
+  # renders this product. What it cannot be is the *published* image — the API
+  # address is compiled into the bundle at build time, and the published one is
+  # built for nexus.gerege.mn. So it is built here, from the core repository, for
+  # this origin. That is the one thing about the frontend a distribution owns.
+  web:
+    image: ${WEB_IMAGE:-appstore-nexus-web:v1}
+    container_name: gerege_appstore_nexus_web
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+    ports:
+      - "127.0.0.1:3014:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
 volumes:
   gerege_appstore_nexus_postgres_data:
     external: true
