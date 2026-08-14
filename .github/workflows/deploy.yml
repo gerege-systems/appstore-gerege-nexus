@@ -47,7 +47,7 @@ jobs:
           fi
 
       - name: Build and restart
-        uses: appleboy/ssh-action@v1.2.0
+        uses: appleboy/ssh-action@v1.2.5
         env:
           REBUILD_SHELL: ${{ inputs.rebuild_shell }}
         with:
