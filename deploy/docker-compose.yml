@@ -20,6 +20,13 @@
 #   PUBLIC_ORIGIN                     where this instance answers
 #   SSO_DEFAULT_CLIENT_SECRET         identity still belongs to nexus.gerege.mn
 
+# The project name is fixed here rather than taken from the directory, because
+# an earlier deployment of this stack already created these containers and this
+# volume under it. Left to default, compose would derive "deploy" from the
+# folder and try to build a second stack beside the first, under names the
+# first one holds.
+name: appstore-nexus
+
 services:
   postgres:
     image: postgres:16-alpine
