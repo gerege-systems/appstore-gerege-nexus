@@ -1,0 +1,69 @@
+name: Security
+
+# A distribution needs this scan more than the core does, not less. The core is
+# a library; this repository is what actually runs on a public host. And it does
+# not inherit the core's scan: the core's runs against the core's own dependency
+# graph, while what ships here is *this* graph — the pinned platform plus our
+# own modules, resolved together. The two differ, and the difference is exactly
+# where an unnoticed vulnerability would live.
+#
+# The weekly schedule is the point of the whole thing. A vulnerability is not
+# published when we happen to be committing; without a cron, a quiet repository
+# is one that stopped looking.
+
+on:
+  schedule:
+    # Monday 09:20 UTC, twenty minutes after the core's, so the two scans do not
+    # report the same new advisory in the same minute from different repos.
+    - cron: "20 9 * * 1"
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  govulncheck:
+    name: Vulnerability Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+      # Reports only vulnerabilities our code can actually reach, so a fix can
+      # be a dependency bump here even when the core has not released one yet:
+      # go.mod is ours, and a newer indirect version needs no permission from
+      # upstream.
+      - name: Run govulncheck
+        run: govulncheck ./...
+
+  gosec:
+    name: Static Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+      # Built from source with the toolchain setup-go just installed rather than
+      # run from the published action's container — that container carries its
+      # own older Go, which cannot compile a module targeting a newer language
+      # version, and the result is a red scan that has found nothing.
+      #
+      # Pinned to the same version the core uses, so a finding here means the
+      # same thing it means there.
+      - name: Install gosec
+        run: go install github.com/securego/gosec/v2/cmd/gosec@v2.22.8
+      # G104 (unchecked errors) is golangci-lint's job. G404 (math/rand) is
+      # excluded in the core for jitter; nothing here uses math/rand at all, and
+      # it stays excluded so the two scans are configured identically — if this
+      # repository ever does reach for it, the core's reasoning applies.
+      - name: Run gosec
+        run: gosec -exclude=G104,G404 ./...
