@@ -1,0 +1,109 @@
+# The App Store, as a Gerege Nexus distribution.
+#
+# What makes this instance a store is not a special build of the platform: it is
+# this product's own binary — the same platform plus three modules — pointed at
+# this product's catalogue, holding the signing key. Every other deployment runs
+# the platform without those three and cannot publish a catalogue at all.
+#
+# It comes up *beside* the standalone registry it replaces, on its own port and
+# its own database, and changes nothing about that service. Switching the domain
+# over is a separate, deliberate act — see APPSTORE_OPERATIONS §6.4 in the core
+# repository, which asks for catalog-diff to report byte-identical catalogues
+# first. A store that starts serving a different catalogue than the one every
+# instance in the field has pinned is a store that breaks all of them at once.
+#
+# Required environment (deploy/.env):
+#   APPSTORE_NEXUS_POSTGRES_PASSWORD  this stack's own database
+#   APPSTORE_SIGNING_KEY              the SAME key the standalone registry uses;
+#                                     every instance pins the public half, so a
+#                                     new key is a catalogue they all reject
+#   PUBLIC_ORIGIN                     where this instance answers
+#   SSO_DEFAULT_CLIENT_SECRET         identity still belongs to nexus.gerege.mn
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: gerege_appstore_nexus_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: platform_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${APPSTORE_NEXUS_POSTGRES_PASSWORD:?APPSTORE_NEXUS_POSTGRES_PASSWORD is required}
+    # A port of its own: the standalone registry's postgres already holds 5432
+    # on this host, and the two must not be able to reach each other's data by
+    # accident during the parallel run.
+    ports:
+      - "127.0.0.1:5436:5432"
+    volumes:
+      - gerege_appstore_nexus_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d platform_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    image: ${IMAGE:-appstore-nexus:v1}
+    container_name: gerege_appstore_nexus_migrate
+    # The platform's migrations, from the core version this product's go.mod
+    # pins — the image carries both, so they cannot drift apart.
+    command: ["/app/migrate", "up"]
+    environment:
+      DATABASE_URL: postgres://postgres:${APPSTORE_NEXUS_POSTGRES_PASSWORD}@postgres:5432/platform_db?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  backend:
+    image: ${IMAGE:-appstore-nexus:v1}
+    container_name: gerege_appstore_nexus_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://postgres:${APPSTORE_NEXUS_POSTGRES_PASSWORD}@postgres:5432/platform_db?sslmode=disable
+      ENVIRONMENT: production
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-https://appstore-next.gerege.mn}
+      ALLOWED_ORIGINS: ${PUBLIC_ORIGIN:-https://appstore-next.gerege.mn}
+
+      # This product's own catalogue, shipped in the image: the three store
+      # modules and the two platform apps they sit beside.
+      APP_CATALOG_PATH: /app/catalog/apps.json
+      # Deliberately empty. This instance *is* the registry; pointing it at one
+      # would have it pulling its own catalogue from itself.
+      APP_CATALOG_URL: ""
+
+      # The signing key. Its absence is what makes every other instance refuse
+      # to serve a catalogue, so this is the single setting that distinguishes
+      # the store from an ordinary deployment.
+      APPSTORE_SIGNING_KEY: ${APPSTORE_SIGNING_KEY:?APPSTORE_SIGNING_KEY is required}
+      APPSTORE_SIGNING_KEY_ID: ${APPSTORE_SIGNING_KEY_ID:-appstore-2026}
+
+      # Identity still belongs to nexus.gerege.mn: every OAuth2 client in the
+      # field is registered against that issuer, and moving it would be a change
+      # every one of them has to make.
+      SSO_ISSUER: ${SSO_ISSUER:-https://nexus.gerege.mn}
+      SSO_DEFAULT_CLIENT_SECRET: ${SSO_DEFAULT_CLIENT_SECRET}
+
+      # No demo tenant. A store is not a sandbox, and seeded data would end up
+      # in a catalogue somebody's instance reads.
+      DEMO_MODE: "false"
+    # Its own port. The standalone registry holds 8085; nothing about it moves
+    # until the upstream does.
+    ports:
+      - "127.0.0.1:8087:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  gerege_appstore_nexus_postgres_data:
+    external: true
+    name: appstore-nexus_gerege_appstore_nexus_postgres_data
