@@ -20,9 +20,20 @@ RUN go mod download
 
 COPY . .
 
-ARG VERSION=0.0.0
-RUN CGO_ENABLED=0 GOOS=linux go build -trimpath \
-    -ldflags="-w -s -X github.com/gerege-systems/open-gerege-nexus/backend/internal/platform.PlatformVersion=${VERSION}" \
+# What this build tells an app store it is.
+#
+# Derived from the core version go.mod pins rather than passed in, because it
+# is not a choice: PlatformVersion is what every manifest's
+# `"platform": ">=1.0.0"` is checked against, and the honest answer is the
+# version of the platform actually compiled into this image. Left to a build
+# argument it defaulted to 0.0.0 the first time a deploy forgot to pass one,
+# and the instance refused every manifest it shipped with — it could not read
+# its own catalogue, so it would not start.
+RUN core=$(go list -m -f '{{.Version}}' github.com/gerege-systems/open-gerege-nexus/backend) \
+    && version=${core#v} \
+    && echo "building as platform ${version}" \
+    && CGO_ENABLED=0 GOOS=linux go build -trimpath \
+    -ldflags="-w -s -X github.com/gerege-systems/open-gerege-nexus/backend/internal/platform.PlatformVersion=${version}" \
     -o /bin/appstore .
 
 # The core's migration runner, from the version this product depends on. It is
