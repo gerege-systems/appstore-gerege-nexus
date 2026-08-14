@@ -1,0 +1,9 @@
+# Local workspace for developing against an unreleased core. Never committed:
+# a distribution that ships a go.work is a distribution whose CI is testing a
+# platform nobody else has.
+go.work
+go.work.sum
+
+bin/
+*.log
+.DS_Store

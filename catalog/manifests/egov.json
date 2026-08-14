@@ -1,0 +1,63 @@
+{
+  "id": "io.gerege.nexus.egov",
+  "name": "e-Government Link",
+  "version": "1.0.0",
+  "platform": ">=1.0.0",
+  "publisher": "gerege",
+  "authors": [
+    {
+      "name": "Gerege Systems Development Team"
+    }
+  ],
+  "maintainers": [
+    {
+      "name": "Gerege Systems Development Team"
+    }
+  ],
+  "repository": "https://github.com/gerege-systems/open-gerege-nexus",
+  "homepage": "https://nexus.gerege.mn",
+  "license": "Apache-2.0",
+  "dependencies": [],
+  "permissions": [
+    {
+      "code": "egov.read",
+      "name": "Read e-Government Link",
+      "description": "See how this organisation is connected to the state's systems, and what it has looked up"
+    },
+    {
+      "code": "egov.citizen.read",
+      "name": "Query the citizen registry",
+      "description": "Look up authoritative citizen data through XYP",
+      "admin_only": true
+    },
+    {
+      "code": "egov.company.read",
+      "name": "Query the company registry",
+      "description": "Look up authoritative legal-entity data through XYP",
+      "admin_only": true
+    }
+  ],
+  "menus": [
+    {
+      "id": "egov_lookups",
+      "label": "Registry lookups",
+      "path": "/egov",
+      "icon": "landmark",
+      "order": 10
+    },
+    {
+      "id": "egov_connections",
+      "label": "Connections",
+      "path": "/egov/connections",
+      "icon": "share-2",
+      "order": 20
+    },
+    {
+      "id": "egov_history",
+      "label": "Lookup history",
+      "path": "/egov/history",
+      "icon": "scroll-text",
+      "order": 30
+    }
+  ]
+}

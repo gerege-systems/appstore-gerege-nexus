@@ -1,0 +1,55 @@
+{
+  "id": "io.gerege.nexus.publisher_studio",
+  "name": "Publisher Studio",
+  "version": "1.0.0",
+  "platform": ">=1.0.0",
+  "publisher": "gerege",
+  "authors": [
+    {
+      "name": "Gerege Systems Development Team"
+    }
+  ],
+  "maintainers": [
+    {
+      "name": "Gerege Systems Development Team"
+    }
+  ],
+  "repository": "https://github.com/gerege-systems/open-gerege-nexus",
+  "homepage": "https://nexus.gerege.mn",
+  "license": "Apache-2.0",
+  "dependencies": [
+    {
+      "id": "io.gerege.nexus.appstore_registry",
+      "version_constraint": ">=1.0.0"
+    }
+  ],
+  "permissions": [
+    {
+      "code": "publisher.read",
+      "name": "See published apps",
+      "description": "View this organisation's publishing profile, apps and submissions"
+    },
+    {
+      "code": "publisher.manage",
+      "name": "Publish apps",
+      "description": "Register apps and submit versions for review on this organisation's behalf"
+    }
+  ],
+  "menus": [
+    {
+      "id": "publisher_studio",
+      "label": "Publisher Studio",
+      "path": "/module/publisher",
+      "icon": "upload",
+      "order": 20,
+      "labels": {
+        "mn": "Нийтлэгчийн студи",
+        "ar": "استوديو الناشر",
+        "zh": "发布者工作室",
+        "fr": "Studio de l'éditeur",
+        "ru": "Студия издателя",
+        "es": "Estudio del editor"
+      }
+    }
+  ]
+}

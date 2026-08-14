@@ -1,0 +1,17 @@
+{
+  "app_id": "io.gerege.nexus.publisher_studio",
+  "entries": [
+    {
+      "version": "1.0.0",
+      "released_at": "2026-08-12",
+      "kind": "feature",
+      "summary": {
+        "mn": "Апп бүртгэж, хувилбарыг хяналтад илгээнэ.",
+        "en": "Register apps and submit versions for review."
+      },
+      "authors": [
+        "craftzbay"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "id": "io.gerege.nexus.store_review",
+  "name": "Store Review",
+  "version": "1.0.0",
+  "platform": ">=1.0.0",
+  "publisher": "gerege",
+  "authors": [
+    {
+      "name": "Gerege Systems Development Team"
+    }
+  ],
+  "maintainers": [
+    {
+      "name": "Gerege Systems Development Team"
+    }
+  ],
+  "repository": "https://github.com/gerege-systems/open-gerege-nexus",
+  "homepage": "https://nexus.gerege.mn",
+  "license": "Apache-2.0",
+  "dependencies": [
+    {
+      "id": "io.gerege.nexus.appstore_registry",
+      "version_constraint": ">=1.0.0"
+    }
+  ],
+  "permissions": [
+    {
+      "code": "store_review.read",
+      "name": "See the review queue",
+      "description": "View submitted versions and their review history"
+    },
+    {
+      "code": "store_review.decide",
+      "name": "Publish and reject",
+      "description": "Publish, reject or withdraw a submitted version, and verify a publisher"
+    }
+  ],
+  "menus": [
+    {
+      "id": "store_review",
+      "label": "Review Queue",
+      "path": "/module/store-review",
+      "icon": "list-checks",
+      "order": 30,
+      "labels": {
+        "mn": "Хяналтын дараалал",
+        "ar": "قائمة المراجعة",
+        "zh": "审核队列",
+        "fr": "File de revue",
+        "ru": "Очередь проверки",
+        "es": "Cola de revisión"
+      }
+    }
+  ]
+}

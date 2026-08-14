@@ -1,0 +1,17 @@
+{
+  "app_id": "io.gerege.nexus.appstore_registry",
+  "entries": [
+    {
+      "version": "1.0.0",
+      "released_at": "2026-08-12",
+      "kind": "feature",
+      "summary": {
+        "mn": "Gerege Nexus сүлжээний бүх инстанс уншдаг, гарын үсэгтэй каталог.",
+        "en": "The signed catalogue every Gerege Nexus instance reads."
+      },
+      "authors": [
+        "craftzbay"
+      ]
+    }
+  ]
+}

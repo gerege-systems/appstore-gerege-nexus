@@ -1,0 +1,137 @@
+[
+  {
+    "id": "io.gerege.nexus.organisation",
+    "slug": "organisation",
+    "name": "Organisation & People",
+    "description": "The organisation itself: its legal identity, its departments, and the people who work in it.",
+    "icon_url": "/icons/organisation.png",
+    "category": "Platform",
+    "visibility": "public",
+    "version": "1.0.0",
+    "translations": {
+      "mn": {
+        "name": "Байгууллага ба ажилтнууд",
+        "description": "Байгууллагын хуулийн мэдээлэл, хэлтэс нэгж, ажилтнуудын бүртгэл.",
+        "category": "Платформ"
+      },
+      "ar": {
+        "name": "المؤسسة والأشخاص",
+        "description": "الهوية القانونية للمؤسسة وأقسامها والعاملون فيها.",
+        "category": "المنصة"
+      },
+      "zh": {
+        "name": "组织与人员",
+        "description": "组织的法律信息、部门结构与人员名录。",
+        "category": "平台"
+      },
+      "fr": {
+        "name": "Organisation et personnes",
+        "description": "L'identité légale de l'organisation, ses départements et ses collaborateurs.",
+        "category": "Plateforme"
+      },
+      "ru": {
+        "name": "Организация и сотрудники",
+        "description": "Юридические данные организации, её подразделения и сотрудники.",
+        "category": "Платформа"
+      },
+      "es": {
+        "name": "Organización y personas",
+        "description": "La identidad legal de la organización, sus departamentos y sus personas.",
+        "category": "Plataforma"
+      }
+    }
+  },
+  {
+    "id": "io.gerege.nexus.egov",
+    "slug": "egov",
+    "name": "e-Government Link",
+    "description": "This organisation's connection to the state's systems: registry lookups through ХУР, the eID and ДАН rails, and a record of what was asked.",
+    "icon_url": "/icons/egov.png",
+    "category": "Platform",
+    "visibility": "public",
+    "version": "1.0.0",
+    "translations": {
+      "mn": {
+        "name": "Цахим засгийн холболт",
+        "description": "Байгууллагын төрийн системтэй холбогдох цэг: ХУР-ын лавлагаа, eID ба ДАН суваг, лавлагааны түүх.",
+        "category": "Платформ"
+      },
+      "ar": {
+        "name": "الربط بالحكومة الإلكترونية",
+        "description": "صلة هذه المؤسسة بأنظمة الدولة: استعلامات السجل عبر ХУР، وقناتا eID و ДАН، وسجل بما تم الاستعلام عنه.",
+        "category": "المنصة"
+      },
+      "zh": {
+        "name": "电子政务连接",
+        "description": "本组织与国家系统的连接：通过 ХУР 的登记查询、eID 与 ДАН 通道，以及查询记录。",
+        "category": "平台"
+      },
+      "fr": {
+        "name": "Liaison e-gouvernement",
+        "description": "Le lien de cette organisation avec les systèmes de l'État : consultations du registre via ХУР, canaux eID et ДАН, et l'historique des demandes.",
+        "category": "Plateforme"
+      },
+      "ru": {
+        "name": "Подключение к электронному правительству",
+        "description": "Связь организации с государственными системами: справки из реестра через ХУР, каналы eID и ДАН, история запросов.",
+        "category": "Платформа"
+      },
+      "es": {
+        "name": "Enlace con la administración electrónica",
+        "description": "La conexión de esta organización con los sistemas del Estado: consultas al registro vía ХУР, canales eID y ДАН, e historial de consultas.",
+        "category": "Plataforma"
+      }
+    }
+  },
+  {
+    "id": "io.gerege.nexus.appstore_registry",
+    "slug": "appstore-registry",
+    "name": "App Store Registry",
+    "description": "The signed catalogue every Gerege Nexus instance reads.",
+    "icon_url": "/icons/appstore-registry.png",
+    "category": "Platform",
+    "visibility": "public",
+    "version": "1.0.0",
+    "translations": {
+      "mn": {
+        "name": "Аппын бүртгэл",
+        "description": "Gerege Nexus сүлжээний бүх инстанс уншдаг, гарын үсэгтэй каталог.",
+        "category": "Платформ"
+      }
+    }
+  },
+  {
+    "id": "io.gerege.nexus.publisher_studio",
+    "slug": "publisher-studio",
+    "name": "Publisher Studio",
+    "description": "Register apps and submit versions for review.",
+    "icon_url": "/icons/publisher-studio.png",
+    "category": "Platform",
+    "visibility": "public",
+    "version": "1.0.0",
+    "translations": {
+      "mn": {
+        "name": "Нийтлэгчийн студи",
+        "description": "Апп бүртгэж, хувилбарыг хяналтад илгээнэ.",
+        "category": "Платформ"
+      }
+    }
+  },
+  {
+    "id": "io.gerege.nexus.store_review",
+    "slug": "store-review",
+    "name": "Store Review",
+    "description": "The queue a submitted version waits in, and the decision that ends the wait.",
+    "icon_url": "/icons/store-review.png",
+    "category": "Platform",
+    "visibility": "public",
+    "version": "1.0.0",
+    "translations": {
+      "mn": {
+        "name": "Хяналтын дараалал",
+        "description": "Илгээсэн хувилбар хүлээх дараалал ба шийдвэр.",
+        "category": "Платформ"
+      }
+    }
+  }
+]

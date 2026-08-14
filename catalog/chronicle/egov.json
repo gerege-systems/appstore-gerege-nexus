@@ -1,0 +1,21 @@
+{
+  "app_id": "io.gerege.nexus.egov",
+  "entries": [
+    {
+      "version": "1.0.0",
+      "released_at": "2026-08-13",
+      "kind": "feature",
+      "summary": {
+        "mn": "Төрийн системтэй холбогдох цэгийг нэг апп болгон цуглуулав.",
+        "en": "The connection to the state's systems, gathered into one app."
+      },
+      "details": {
+        "mn": "ХУР-ын иргэн/хуулийн этгээдийн лавлагаа платформын маршрутын хүснэгтээс энэ модуль руу нүүв; холболтын төлөв (ХУР, eID, ДАН) ба лавлагааны түүх шинээр нэмэгдэв. Нэвтрэлтийн урсгал ба хүний өөрийн холбосон identity нь платформд үлдсэн — тэдгээр нь апп суусан эсэхээс хамаарах ёсгүй.",
+        "en": "The ХУР citizen and company lookups moved here from the platform's own route table; the state of the three rails and the history of what was looked up are new. The sign-in flows and a person's own linked identities stay on the platform, where they do not depend on which apps a tenant installed."
+      },
+      "authors": [
+        "craftzbay"
+      ]
+    }
+  ]
+}

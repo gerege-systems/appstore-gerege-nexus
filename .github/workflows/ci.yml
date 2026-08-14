@@ -1,0 +1,51 @@
+name: CI
+
+# A distribution's CI has one job the core's does not: to be the place where a
+# new core release stops being a rumour. Renovate opens a PR that moves one line
+# in go.mod, and this is what says whether the platform still works for us.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      # The core is a dependency, not a checkout. A `replace` pointing at a
+      # local path or a branch would make this build pass on something no
+      # deployment will ever run — see the ecosystem strategy, §5 rule 1.
+      - name: The core is taken by tag
+        run: |
+          if grep -qE '^\s*replace\s' go.mod; then
+            echo "::error::go.mod has a replace directive; a distribution pins the core by tag"
+            exit 1
+          fi
+          version=$(go list -m -f '{{.Version}}' github.com/gerege-systems/open-gerege-nexus/backend)
+          echo "core: $version"
+          case "$version" in
+            v*.*.*-*) echo "::error::the core is pinned to a pseudo-version ($version); use a release tag"; exit 1 ;;
+          esac
+
+      - run: go build ./...
+      - run: go vet ./...
+      - run: go test -race ./...
+
+      - name: gofmt
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "::error::not gofmt-clean:"; echo "$unformatted"; exit 1
+          fi

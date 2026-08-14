@@ -1,0 +1,17 @@
+{
+  "app_id": "io.gerege.nexus.store_review",
+  "entries": [
+    {
+      "version": "1.0.0",
+      "released_at": "2026-08-12",
+      "kind": "feature",
+      "summary": {
+        "mn": "Илгээсэн хувилбар хүлээх дараалал ба шийдвэр.",
+        "en": "The queue a submitted version waits in, and the decision that ends the wait."
+      },
+      "authors": [
+        "craftzbay"
+      ]
+    }
+  ]
+}

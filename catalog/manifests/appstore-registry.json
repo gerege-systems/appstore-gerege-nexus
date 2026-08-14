@@ -1,0 +1,50 @@
+{
+  "id": "io.gerege.nexus.appstore_registry",
+  "name": "App Store Registry",
+  "version": "1.0.0",
+  "platform": ">=1.0.0",
+  "publisher": "gerege",
+  "authors": [
+    {
+      "name": "Gerege Systems Development Team"
+    }
+  ],
+  "maintainers": [
+    {
+      "name": "Gerege Systems Development Team"
+    }
+  ],
+  "repository": "https://github.com/gerege-systems/open-gerege-nexus",
+  "homepage": "https://nexus.gerege.mn",
+  "license": "Apache-2.0",
+  "dependencies": [],
+  "permissions": [
+    {
+      "code": "appstore_registry.read",
+      "name": "Read the registry",
+      "description": "See the registry's state and its published catalogue"
+    },
+    {
+      "code": "appstore_registry.manage",
+      "name": "Operate the registry",
+      "description": "Rebuild the catalogue snapshot and manage registry state"
+    }
+  ],
+  "menus": [
+    {
+      "id": "appstore_registry",
+      "label": "App Registry",
+      "path": "/module/appstore/registry",
+      "icon": "boxes",
+      "order": 10,
+      "labels": {
+        "mn": "Аппын бүртгэл",
+        "ar": "سجل التطبيقات",
+        "zh": "应用注册表",
+        "fr": "Registre des applications",
+        "ru": "Реестр приложений",
+        "es": "Registro de aplicaciones"
+      }
+    }
+  ]
+}

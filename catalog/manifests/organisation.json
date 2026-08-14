@@ -1,0 +1,49 @@
+{
+  "id": "io.gerege.nexus.organisation",
+  "name": "Organisation & People",
+  "version": "1.0.0",
+  "platform": ">=1.0.0",
+  "publisher": "gerege",
+  "authors": [
+    {
+      "name": "Gerege Systems Development Team"
+    }
+  ],
+  "maintainers": [
+    {
+      "name": "Gerege Systems Development Team"
+    }
+  ],
+  "repository": "https://github.com/gerege-systems/open-gerege-nexus",
+  "homepage": "https://nexus.gerege.mn",
+  "license": "Apache-2.0",
+  "dependencies": [],
+  "permissions": [
+    {
+      "code": "organisation.read",
+      "name": "Read Organisation",
+      "description": "View the organisation profile, its departments and its people"
+    },
+    {
+      "code": "organisation.manage",
+      "name": "Manage Organisation",
+      "description": "Edit the organisation profile, its departments and its people"
+    }
+  ],
+  "menus": [
+    {
+      "id": "organisation_departments",
+      "label": "Departments",
+      "path": "/organisation/departments",
+      "icon": "network",
+      "order": 6
+    },
+    {
+      "id": "organisation_people",
+      "label": "People",
+      "path": "/organisation/people",
+      "icon": "users",
+      "order": 7
+    }
+  ]
+}

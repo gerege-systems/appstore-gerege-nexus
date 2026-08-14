@@ -1,0 +1,21 @@
+{
+  "app_id": "io.gerege.nexus.organisation",
+  "entries": [
+    {
+      "version": "1.0.0",
+      "released_at": "2026-08-05",
+      "kind": "feature",
+      "summary": {
+        "mn": "Байгууллагын хуулийн мэдээлэл, хэлтэс нэгжийн мод, ажилтны бүртгэл.",
+        "en": "The organisation's legal identity, its department tree and its people."
+      },
+      "details": {
+        "mn": "Тенант бүрийн хуулийн этгээдийн мэдээлэл, хэлтэс нэгжийг модоор зохион байгуулах, гишүүдийг нэгжид харьяалуулах үндсэн бүртгэл.",
+        "en": "Per-tenant legal details, departments organised as a tree, and membership of people in those units."
+      },
+      "authors": [
+        "craftzbay"
+      ]
+    }
+  ]
+}
