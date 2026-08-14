@@ -124,6 +124,11 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
+      # Where the shell asks, server-side, whether this deployment is a store —
+      # so the catalogue is in the HTML rather than swapped in after it. The
+      # browser never uses this: it asks its own origin (lib/apiBase.ts). A
+      # server has no origin, which is the whole reason this exists.
+      API_INTERNAL_URL: http://backend:8080/api/v1
     # 3013 is the standalone store's web and 3014 the developer console; this
     # host runs several products and the ports are first-come.
     ports:
