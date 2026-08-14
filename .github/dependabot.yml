@@ -1,0 +1,54 @@
+version: 2
+
+# The scanner in security.yml says when a dependency has become dangerous.
+# Nothing said when one had merely become old — and those are the same fact
+# separated by time. GO-2026-6222 sat in this repository's go.mod for exactly
+# as long as it took a human to go looking for it.
+#
+# Dependabot rather than Renovate: Renovate is a GitHub App somebody has to
+# install and grant access to, so it works when an administrator gets to it.
+# This file works when it merges.
+#
+# Everything is grouped and weekly. Ungrouped updates open a pull request per
+# module, and a review queue nobody reads is the same as no automation — worse,
+# because it looks like automation.
+
+updates:
+  # The pinned platform is the important one and gets its own group, because it
+  # is a different question from every other bump. `golang.org/x/text` moving is
+  # housekeeping; the core moving is "does the App Store still work on the new
+  # platform", and CI answering yes is the whole reason this repository builds
+  # against a tag instead of a checkout.
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "10:00"
+    open-pull-requests-limit: 5
+    groups:
+      platform:
+        patterns:
+          - github.com/gerege-systems/open-gerege-nexus/backend
+      go-dependencies:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - github.com/gerege-systems/open-gerege-nexus/backend
+    commit-message:
+      prefix: "deps"
+
+  # Workflows pin actions by major tag, which floats — until an action's author
+  # ships v5 and the pin stops receiving anything, silently, for years.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "10:00"
+    groups:
+      actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "ci"

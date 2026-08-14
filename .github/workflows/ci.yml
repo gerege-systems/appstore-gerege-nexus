@@ -1,8 +1,10 @@
 name: CI
 
 # A distribution's CI has one job the core's does not: to be the place where a
-# new core release stops being a rumour. Renovate opens a PR that moves one line
-# in go.mod, and this is what says whether the platform still works for us.
+# new core release stops being a rumour. Dependabot opens a pull request moving
+# one line in go.mod — see .github/dependabot.yml, where the platform is its own
+# group for exactly this reason — and this is what answers whether the App Store
+# still works on it.
 
 on:
   push:
