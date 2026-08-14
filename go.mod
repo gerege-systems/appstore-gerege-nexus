@@ -41,9 +41,11 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/mattetti/filebuffer v1.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.27 // indirect
+	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pdfcpu/pdfcpu v0.14.0 // indirect
 	github.com/pquerna/otp v1.5.0 // indirect
+	github.com/pressly/goose/v3 v3.27.3 // indirect
 	github.com/prometheus/client_golang v1.24.1 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.70.1 // indirect
@@ -51,6 +53,7 @@ require (
 	github.com/redis/go-redis/v9 v9.22.0 // indirect
 	github.com/richardlehane/mscfb v1.0.7 // indirect
 	github.com/richardlehane/msoleps v1.0.6 // indirect
+	github.com/sethvargo/go-retry v0.4.0 // indirect
 	github.com/tiendc/go-deepcopy v1.7.2 // indirect
 	github.com/xuri/efp v0.0.1 // indirect
 	github.com/xuri/excelize/v2 v2.11.0 // indirect
@@ -80,3 +83,9 @@ require (
 	google.golang.org/grpc v1.83.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
+
+// The core's migration runner, declared as a tool so `go mod tidy` keeps the
+// sums for it. This product's own code never imports it — it is a main package
+// — but the image builds it, and the schema it applies has to come from the
+// same core version everything else here is compiled against.
+tool github.com/gerege-systems/open-gerege-nexus/backend/cmd/migrate
