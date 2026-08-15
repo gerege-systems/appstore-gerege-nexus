@@ -70,7 +70,17 @@ jobs:
         env:
           DATABASE_URL: ${{ env.APPSTORE_TEST_DATABASE_URL }}
         run: |
+          # Downloaded first, because {{.Dir}} is empty for a module that is not
+          # in the local cache — and an empty one made MIGRATIONS_DIR read
+          # "/db/migrations", which failed a step later with a path nobody
+          # wrote. It passed the first time this job ran only because the
+          # module happened to be cached; the release after it was not.
+          go mod download github.com/gerege-systems/open-gerege-nexus/backend
           core=$(go list -m -f '{{.Dir}}' github.com/gerege-systems/open-gerege-nexus/backend)
+          if [ -z "$core" ] || [ ! -d "$core/db/migrations" ]; then
+            echo "::error::the core module's migrations are not on disk (dir: '$core')"
+            exit 1
+          fi
           echo "core module: $core"
           MIGRATIONS_DIR="$core/db/migrations" go tool migrate up
 
