@@ -286,13 +286,13 @@ func seedApps(t *testing.T, pool *pgxpool.Pool) (publisher, public, private stri
 			app.id, publisher, app.slug, app.visibility); err != nil {
 			t.Fatalf("seed app %s: %v", app.id, err)
 		}
-		// The manifest carries no visibility here on purpose: what the catalogue
-		// builder filters on is store_apps.visibility, the column, and this test
-		// is about that. The manifest field is the publisher's declaration on
-		// the way *in* — see the submission path — and it reaches this column
-		// rather than replacing it.
+		// The manifest carries the same declaration the column does, which is
+		// the shape a real submission has: the publisher declares it on the
+		// manifest, and the registry stores it on the app. What the catalogue
+		// builder filters on is the column.
 		manifest := catalog.Manifest{
 			ID: app.id, Name: app.slug, Version: "1.0.0", Platform: ">=1.0.0",
+			Visibility: app.visibility,
 		}
 		if _, err := pool.Exec(ctx,
 			`INSERT INTO store_app_versions (app_id, version, channel, min_platform, manifest, status, published_at)

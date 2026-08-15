@@ -1,7 +1,7 @@
 {
   "id": "io.gerege.nexus.organisation",
-  "name": "Organisation & People",
-  "version": "1.0.0",
+  "name": "Directory",
+  "version": "2.0.0",
   "platform": ">=1.0.0",
   "publisher": "gerege",
   "authors": [
@@ -21,13 +21,13 @@
   "permissions": [
     {
       "code": "organisation.read",
-      "name": "Read Organisation",
-      "description": "View the organisation profile, its departments and its people"
+      "name": "Read Directory",
+      "description": "Allows viewing the organisation profile, its departments, its people and its contacts"
     },
     {
       "code": "organisation.manage",
-      "name": "Manage Organisation",
-      "description": "Edit the organisation profile, its departments and its people"
+      "name": "Manage Directory",
+      "description": "Allows editing the organisation profile, its departments, its people and its contacts"
     }
   ],
   "menus": [
@@ -44,6 +44,13 @@
       "path": "/organisation/people",
       "icon": "users",
       "order": 7
+    },
+    {
+      "id": "contacts",
+      "label": "Contacts",
+      "path": "/contacts",
+      "icon": "users",
+      "order": 10
     }
   ]
 }

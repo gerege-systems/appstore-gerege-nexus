@@ -2,6 +2,22 @@
   "app_id": "io.gerege.nexus.organisation",
   "entries": [
     {
+      "version": "2.0.0",
+      "released_at": "2026-08-15",
+      "kind": "feature",
+      "summary": {
+        "mn": "Харилцагчийн апп энэ аппын дотор орж, хоёр карт нэг болов.",
+        "en": "The Contacts app moved inside this one: two cards became one."
+      },
+      "details": {
+        "mn": "Хоёр апп нэг л сэдвийг хоёр хуваасан байв: энэ байгууллага хэнээс бүрддэг вэ, хэнтэй харьцдаг вэ. Нэгийг нь суулгаад нөгөөг нь суулгаагүй админ хагас лавлахтай үлддэг байсан бөгөөд аль хагас нь дутсаныг стор хэлдэггүй байв. Одоо хэлтэс, ажилтан, харилцагч гурав нэг аппын дор. Эрх нэг болов: contacts.read/manage → organisation.read/manage (миграц 00059). Харилцагчийн замууд өөрсдөө эрхээ шалгадаг болов — өмнө нь платформ модулийн prefix-ээр шалгадаг байсан бөгөөд нэгдсэний дараа тэр шалгалт чимээгүй алга болох байв. API-ийн зам /api/v1/contacts, дэлгэцийн хаяг /contacts хоёул хэвээр.",
+        "en": "The two apps were one subject cut in half: who this organisation is made of, and who it deals with. An administrator installing one and not the other got half a directory, and nothing in the store said which half. Departments, people and contacts are one app now. The permissions became one set: contacts.read/manage → organisation.read/manage (migration 00059). The contact routes assert their own permission now — the platform used to gate them from the module's route prefix, and after the merge that check would have vanished without a word. The API path /api/v1/contacts and the screen at /contacts are both unchanged."
+      },
+      "authors": [
+        "craftzbay"
+      ]
+    },
+    {
       "version": "1.0.0",
       "released_at": "2026-08-05",
       "kind": "feature",

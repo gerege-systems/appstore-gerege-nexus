@@ -2,41 +2,41 @@
   {
     "id": "io.gerege.nexus.organisation",
     "slug": "organisation",
-    "name": "Organisation & People",
-    "description": "The organisation itself: its legal identity, its departments, and the people who work in it.",
+    "name": "Directory",
+    "description": "Who this organisation is made of and who it deals with: its departments, its people, and the register of customers, suppliers and partners.",
     "icon_url": "/icons/organisation.png",
     "category": "Platform",
     "visibility": "public",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "translations": {
       "mn": {
-        "name": "Байгууллага ба ажилтнууд",
-        "description": "Байгууллагын хуулийн мэдээлэл, хэлтэс нэгж, ажилтнуудын бүртгэл.",
+        "name": "Бүртгэл",
+        "description": "Байгууллагын хэлтэс нэгж, ажилтнууд, түүнчлэн харилцагч, үйлчлүүлэгч, нийлүүлэгчдийн бүртгэл — дотор, гадна хоёр тал нэг дор.",
         "category": "Платформ"
       },
       "ar": {
-        "name": "المؤسسة والأشخاص",
-        "description": "الهوية القانونية للمؤسسة وأقسامها والعاملون فيها.",
+        "name": "الدليل",
+        "description": "أقسام المؤسسة وموظفوها، وكذلك عملاؤها ومورّدوها وشركاؤها — الداخل والخارج في مكان واحد.",
         "category": "المنصة"
       },
       "zh": {
-        "name": "组织与人员",
-        "description": "组织的法律信息、部门结构与人员名录。",
+        "name": "名录",
+        "description": "组织的部门与人员，以及它的客户、供应商与合作方——内部与外部同在一处。",
         "category": "平台"
       },
       "fr": {
-        "name": "Organisation et personnes",
-        "description": "L'identité légale de l'organisation, ses départements et ses collaborateurs.",
+        "name": "Annuaire",
+        "description": "Les services et les personnes de l'organisation, ainsi que ses clients, fournisseurs et partenaires — le dedans et le dehors au même endroit.",
         "category": "Plateforme"
       },
       "ru": {
-        "name": "Организация и сотрудники",
-        "description": "Юридические данные организации, её подразделения и сотрудники.",
+        "name": "Справочник",
+        "description": "Подразделения и сотрудники организации, а также её клиенты, поставщики и партнёры — внутреннее и внешнее в одном месте.",
         "category": "Платформа"
       },
       "es": {
-        "name": "Organización y personas",
-        "description": "La identidad legal de la organización, sus departamentos y sus personas.",
+        "name": "Directorio",
+        "description": "Los departamentos y las personas de la organización, junto a sus clientes, proveedores y socios: dentro y fuera en un mismo lugar.",
         "category": "Plataforma"
       }
     }
@@ -45,7 +45,7 @@
     "id": "io.gerege.nexus.egov",
     "slug": "egov",
     "name": "e-Government Link",
-    "description": "This organisation's connection to the state's systems: registry lookups through ХУР, the eID and ДАН rails, and a record of what was asked.",
+    "description": "This organisation's connection to the state's systems: registry lookups through XYP, the eID and ДАН rails, and a record of what was asked.",
     "icon_url": "/icons/egov.png",
     "category": "Platform",
     "visibility": "public",

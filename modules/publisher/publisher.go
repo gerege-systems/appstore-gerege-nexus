@@ -48,19 +48,6 @@ func New(p nexus.Platform) *Module {
 	return m
 }
 
-// The two visibilities, spelled out here rather than imported.
-//
-// `catalog.VisibilityPublic` and `VisibilityPrivate` exist in the core's
-// contract package on main, and this repository takes the core by tag and
-// nothing else — that is the ecosystem rule, and pinning a commit to reach two
-// string constants a release early would be a fork with a shorter name and the
-// same cost. They become the core's the first time a release carrying them is
-// bumped in here.
-const (
-	visibilityPublic  = "public"
-	visibilityPrivate = "private"
-)
-
 func (m *Module) ID() string      { return "io.gerege.nexus.publisher_studio" }
 func (m *Module) Name() string    { return "Publisher Studio" }
 func (m *Module) Version() string { return "1.0.0" }
@@ -259,9 +246,9 @@ func (m *Module) handleUpsertApp(w http.ResponseWriter, r *http.Request) {
 	// would hide one for a reason nobody could see. Empty means public, which
 	// is what a publisher who has not thought about it means.
 	if body.Visibility == "" {
-		body.Visibility = visibilityPublic
+		body.Visibility = catalog.VisibilityPublic
 	}
-	if body.Visibility != visibilityPublic && body.Visibility != visibilityPrivate {
+	if body.Visibility != catalog.VisibilityPublic && body.Visibility != catalog.VisibilityPrivate {
 		nexus.Error(w, http.StatusBadRequest, `visibility must be "public" or "private"`)
 		return
 	}
