@@ -23,3 +23,64 @@ permissions:
 jobs:
   ci:
     uses: gerege-systems/open-gerege-nexus/.github/workflows/distribution-ci.yml@main
+
+  # The tests that need a database, which is this product's own business rather
+  # than every distribution's — the shared workflow's rule, applied.
+  #
+  # It is here because of what these tests are about: which apps come back for
+  # whom. A private app reaches the platforms the registry names and no others,
+  # and there is no way to assert that without rows. Skipped for want of a
+  # database, that assertion looks exactly like a passing one.
+  #
+  # Two migration histories, because the App Store has two: the platform's,
+  # which creates the store's tables, and this repository's own, which creates
+  # the ones only the store has. MIGRATIONS_TABLE is what keeps them apart —
+  # goose writes one row per applied version in one table, so both 00001s would
+  # otherwise be the same row.
+  database:
+    name: Database-backed tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: appstore_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      APPSTORE_TEST_DATABASE_URL: postgres://postgres:ci@127.0.0.1:5432/appstore_ci?sslmode=disable
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      # The platform's schema, from the core version go.mod pins. Read out of
+      # the module cache rather than checked out: the schema a build is tested
+      # against has to be the schema the code in it was written against, which
+      # is the same reason the Dockerfile copies it from there.
+      - name: The platform's migrations
+        env:
+          DATABASE_URL: ${{ env.APPSTORE_TEST_DATABASE_URL }}
+        run: |
+          core=$(go list -m -f '{{.Dir}}' github.com/gerege-systems/open-gerege-nexus/backend)
+          echo "core module: $core"
+          MIGRATIONS_DIR="$core/db/migrations" go tool migrate up
+
+      - name: This repository's migrations
+        env:
+          DATABASE_URL: ${{ env.APPSTORE_TEST_DATABASE_URL }}
+          MIGRATIONS_DIR: db/migrations
+          MIGRATIONS_TABLE: goose_db_version_appstore
+        run: go tool migrate up
+
+      # -count=1 rather than the cache: a test whose result depends on rows in a
+      # database is not a test Go can tell has already been run.
+      - run: go test -race -count=1 ./modules/registry
