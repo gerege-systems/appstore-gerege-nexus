@@ -93,5 +93,8 @@ jobs:
               sleep 5
             done
             echo "::error::the backend did not become healthy within 150s"
-            docker compose logs --tail=80 backend migrate
+            # migrate-appstore too: this product has a migration history of its
+            # own now, the backend waits for it, and a failure there looks
+            # exactly like a backend that never became healthy.
+            docker compose logs --tail=80 backend migrate migrate-appstore
             exit 1
