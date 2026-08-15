@@ -48,6 +48,19 @@ func New(p nexus.Platform) *Module {
 	return m
 }
 
+// The two visibilities, spelled out here rather than imported.
+//
+// `catalog.VisibilityPublic` and `VisibilityPrivate` exist in the core's
+// contract package on main, and this repository takes the core by tag and
+// nothing else — that is the ecosystem rule, and pinning a commit to reach two
+// string constants a release early would be a fork with a shorter name and the
+// same cost. They become the core's the first time a release carrying them is
+// bumped in here.
+const (
+	visibilityPublic  = "public"
+	visibilityPrivate = "private"
+)
+
 func (m *Module) ID() string      { return "io.gerege.nexus.publisher_studio" }
 func (m *Module) Name() string    { return "Publisher Studio" }
 func (m *Module) Version() string { return "1.0.0" }
@@ -239,8 +252,18 @@ func (m *Module) handleUpsertApp(w http.ResponseWriter, r *http.Request) {
 		nexus.Error(w, http.StatusBadRequest, `type must be "module" or "external"`)
 		return
 	}
+	// Visibility decides which platforms are offered this app at all — public
+	// to every one of them, private to the ones the registry names — so an
+	// unrecognised value is refused rather than stored. Read as public it would
+	// publish an app on a typo ("Private", "internal"); read as private it
+	// would hide one for a reason nobody could see. Empty means public, which
+	// is what a publisher who has not thought about it means.
 	if body.Visibility == "" {
-		body.Visibility = "public"
+		body.Visibility = visibilityPublic
+	}
+	if body.Visibility != visibilityPublic && body.Visibility != visibilityPrivate {
+		nexus.Error(w, http.StatusBadRequest, `visibility must be "public" or "private"`)
+		return
 	}
 	if body.Category == "" {
 		body.Category = "General"

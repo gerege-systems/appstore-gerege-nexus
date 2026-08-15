@@ -62,6 +62,28 @@ services:
         condition: service_healthy
     restart: "no"
 
+  # This product's own migrations, in their own history.
+  #
+  # Two histories in one database, which is why MIGRATIONS_TABLE is not
+  # optional here: goose keeps one row per applied version in one table, so the
+  # store's 00001 and the platform's 00001 would be the same row and whichever
+  # ran second would be recorded as already applied.
+  #
+  # After the platform's, because the tables here reference store_apps, which
+  # the core's 00038 creates.
+  migrate-appstore:
+    image: ${IMAGE:-appstore-nexus:latest}
+    container_name: gerege_appstore_nexus_migrate_own
+    command: ["/app/migrate", "up"]
+    environment:
+      DATABASE_URL: postgres://postgres:${APPSTORE_NEXUS_POSTGRES_PASSWORD}@postgres:5432/platform_db?sslmode=disable
+      MIGRATIONS_DIR: /app/db/appstore
+      MIGRATIONS_TABLE: goose_db_version_appstore
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: "no"
+
   backend:
     image: ${IMAGE:-appstore-nexus:latest}
     container_name: gerege_appstore_nexus_backend
@@ -102,6 +124,10 @@ services:
       postgres:
         condition: service_healthy
       migrate:
+        condition: service_completed_successfully
+      # The store's own tables as well: the registry reads them on the first
+      # catalogue request, which can arrive before anybody has looked at the UI.
+      migrate-appstore:
         condition: service_completed_successfully
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health >/dev/null 2>&1 || exit 1"]

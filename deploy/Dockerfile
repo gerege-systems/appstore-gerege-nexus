@@ -57,6 +57,15 @@ WORKDIR /app
 COPY --from=build /bin/appstore /app/appstore
 COPY --from=build /bin/migrate  /app/migrate
 COPY --from=build /out/db       /app/db
+# And this product's own migrations, which are not the core's.
+#
+# Everything the App Store has used so far was created by the core's 00038 and
+# stayed there when this product left. New schema is different: a table only the
+# store has any use for does not belong in a migration every deployment of the
+# platform runs. So this history is this repository's, applied with
+# MIGRATIONS_DIR and a MIGRATIONS_TABLE of its own — the pair the core's
+# cmd/migrate grew for exactly this.
+COPY db/migrations              /app/db/appstore
 # This product's catalogue: the three store modules and the two platform apps
 # they sit beside. It is what makes the instance a store.
 COPY catalog /app/catalog

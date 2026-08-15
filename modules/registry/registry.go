@@ -138,6 +138,17 @@ func (m *Module) RegisterRoutes(r chi.Router, gate func(http.Handler) http.Handl
 		ops.Use(gate)
 		ops.Get("/state", m.handleRegistryState)
 		ops.Post("/rebuild", m.handleRebuildSnapshots)
+
+		// Who this registry recognises, and what each of them may be offered
+		// beyond the public catalogue. Gated like the rest of this group: the
+		// catalogue these decisions shape is public, the decisions are not, and
+		// the list of who holds what names every private arrangement the store
+		// has — which is the thing a private app exists to keep off a page.
+		ops.Get("/platforms", m.handleListPlatforms)
+		ops.Post("/platforms", m.handleCreatePlatform)
+		ops.Put("/platforms/{id}/access", m.handleSetPlatformEnabled)
+		ops.Put("/platforms/{id}/apps/{appID}", m.handleGrant)
+		ops.Delete("/platforms/{id}/apps/{appID}", m.handleRevoke)
 	})
 }
 

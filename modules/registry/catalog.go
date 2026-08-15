@@ -104,7 +104,7 @@ func NewCatalogService(store *Store, signer *Signer) *CatalogService {
 // byte-identical output for the same input for ever, and the failure mode if it
 // ever does not is silent: every instance in the field rejects the signature and
 // simply stops receiving updates.
-func (c *CatalogService) Catalog(ctx context.Context, channel, platform string) (*Snapshot, error) {
+func (c *CatalogService) Catalog(ctx context.Context, channel, platform string, audience Audience) (*Snapshot, error) {
 	if channel == "" {
 		channel = "stable"
 	}
@@ -117,7 +117,7 @@ func (c *CatalogService) Catalog(ctx context.Context, channel, platform string) 
 		return nil, err
 	}
 
-	held, err := c.loadSnapshot(ctx, channel, platform)
+	held, err := c.loadSnapshot(ctx, channel, platform, audience)
 	if err != nil {
 		return nil, err
 	}
@@ -125,11 +125,11 @@ func (c *CatalogService) Catalog(ctx context.Context, channel, platform string) 
 		return held, nil
 	}
 
-	built, err := c.build(ctx, channel, platform, revision)
+	built, err := c.build(ctx, channel, platform, revision, audience)
 	if err != nil {
 		return nil, err
 	}
-	if err := c.saveSnapshot(ctx, channel, platform, built); err != nil {
+	if err := c.saveSnapshot(ctx, channel, platform, audience, built); err != nil {
 		// A snapshot that could not be stored is still a correct answer; the
 		// next request rebuilds it. Failing the request instead would make a
 		// full disk look like a broken registry.
@@ -139,11 +139,25 @@ func (c *CatalogService) Catalog(ctx context.Context, channel, platform string) 
 	return built, nil
 }
 
-func (c *CatalogService) loadSnapshot(ctx context.Context, channel, platform string) (*Snapshot, error) {
+// loadSnapshot reads the cached document for this audience.
+//
+// Two tables, because they have two owners. The public catalogue's cache is the
+// core's store_catalog_snapshots, created by migration 00038 and untouched by
+// this feature; a platform's private catalogue goes in store_private_snapshots,
+// which this repository's own migration history owns. Widening the core's table
+// with a column only the App Store has any use for would put App Store schema
+// back in a migration every deployment of the platform runs.
+func (c *CatalogService) loadSnapshot(ctx context.Context, channel, platform string, audience Audience) (*Snapshot, error) {
 	var s Snapshot
-	err := c.store.db.QueryRow(ctx,
-		`SELECT revision, generated_at, etag, document FROM store_catalog_snapshots
-		  WHERE channel = $1 AND platform = $2`, channel, platform).
+	query := `SELECT revision, generated_at, etag, document FROM store_catalog_snapshots
+		  WHERE channel = $1 AND platform = $2`
+	args := []any{channel, platform}
+	if !audience.Anonymous() {
+		query = `SELECT revision, generated_at, etag, document FROM store_private_snapshots
+		  WHERE channel = $1 AND platform = $2 AND platform_id = $3`
+		args = append(args, audience.PlatformID)
+	}
+	err := c.store.db.QueryRow(ctx, query, args...).
 		Scan(&s.Revision, &s.GeneratedAt, &s.ETag, &s.Document)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
@@ -164,7 +178,24 @@ func (c *CatalogService) loadSnapshot(ctx context.Context, channel, platform str
 // rebuild on demand, so the only cost of being wrong here is arithmetic.
 const maxSnapshotsPerChannel = 64
 
-func (c *CatalogService) saveSnapshot(ctx context.Context, channel, platform string, s *Snapshot) error {
+func (c *CatalogService) saveSnapshot(ctx context.Context, channel, platform string, audience Audience, s *Snapshot) error {
+	if !audience.Anonymous() {
+		// Not pruned on a bound of its own: a row here can only be created by a
+		// request carrying a credential this registry issued, so the number of
+		// them is the number of platforms an operator has registered times the
+		// versions they run — not something a stranger can inflate. That is the
+		// difference from the public cache, whose bound exists precisely
+		// because anyone can ask it for one more semver.
+		_, err := c.store.db.Exec(ctx,
+			`INSERT INTO store_private_snapshots
+			     (platform_id, channel, platform, revision, generated_at, etag, document, built_at)
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+			 ON CONFLICT (platform_id, channel, platform) DO UPDATE SET
+			     revision = EXCLUDED.revision, generated_at = EXCLUDED.generated_at,
+			     etag = EXCLUDED.etag, document = EXCLUDED.document, built_at = NOW()`,
+			audience.PlatformID, channel, platform, s.Revision, s.GeneratedAt, s.ETag, s.Document)
+		return err
+	}
 	defer func() {
 		if err := c.pruneSnapshots(ctx, channel); err != nil {
 			slog.Warn("could not prune the catalog snapshot cache", "error", err, "channel", channel)
@@ -202,8 +233,9 @@ type signedDocument struct {
 	Signature   string          `json:"signature"`
 }
 
-// build assembles every published app the given platform can run.
-func (c *CatalogService) build(ctx context.Context, channel, platform string, revision int64) (*Snapshot, error) {
+// build assembles every published app the given platform can run — the public
+// ones, plus whatever this audience has been granted.
+func (c *CatalogService) build(ctx context.Context, channel, platform string, revision int64, audience Audience) (*Snapshot, error) {
 	platformVersion, err := semver.NewVersion(platform)
 	if err != nil {
 		return nil, fmt.Errorf("invalid platform version %q: %w", platform, err)
@@ -220,8 +252,9 @@ func (c *CatalogService) build(ctx context.Context, channel, platform string, re
 		        v.version, v.min_platform, v.manifest, v.published_at
 		   FROM store_apps a
 		   JOIN store_app_versions v ON v.app_id = a.id
-		  WHERE a.visibility = 'public' AND v.channel = $1 AND v.status = 'published'
-		  ORDER BY a.id, v.published_at`, channel)
+		  WHERE (a.visibility = 'public' OR a.id = ANY($2))
+		    AND v.channel = $1 AND v.status = 'published'
+		  ORDER BY a.id, v.published_at`, channel, audience.AppIDs)
 	if err != nil {
 		return nil, err
 	}

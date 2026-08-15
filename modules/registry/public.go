@@ -71,7 +71,26 @@ func (m *Module) handleCatalog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	snapshot, err := m.catalog.Catalog(r.Context(), channel, platform)
+	// Who is asking, when they say. A deployment that has been granted a private
+	// app presents the credential this registry issued it; everybody else — the
+	// overwhelming majority, and every deployment before this existed — presents
+	// nothing and gets exactly the catalogue they always did.
+	//
+	// An unrecognised or revoked credential is treated as no credential rather
+	// than refused. Answering 401 would take the *public* catalogue away from a
+	// deployment whose token was revoked, which is not what revocation means:
+	// it takes back what was granted, not the store.
+	audience, err := m.store.AudienceFor(r.Context(), bearerToken(r.Header.Get("Authorization")))
+	if err != nil {
+		slog.Error("could not resolve the catalog audience", "error", err)
+		nexus.Error(w, http.StatusInternalServerError, "could not build the catalog")
+		return
+	}
+	if !audience.Anonymous() {
+		m.store.TouchPlatform(r.Context(), audience.PlatformID)
+	}
+
+	snapshot, err := m.catalog.Catalog(r.Context(), channel, platform, audience)
 	if err != nil {
 		slog.Error("could not build the catalog", "error", err, "channel", channel, "platform", platform)
 		nexus.Error(w, http.StatusInternalServerError, "could not build the catalog")
@@ -79,7 +98,17 @@ func (m *Module) handleCatalog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("ETag", snapshot.ETag)
-	w.Header().Set("Cache-Control", "public, max-age=60")
+	// Private to the caller once it is answering per credential. A shared cache
+	// holding one platform's catalogue and handing it to the next deployment
+	// that asked would undo the whole of this, and it would look like a caching
+	// win while it did so. Vary names the header the answer turns on, for
+	// anything that caches by request rather than by directive.
+	if audience.Anonymous() {
+		w.Header().Set("Cache-Control", "public, max-age=60")
+	} else {
+		w.Header().Set("Cache-Control", "private, max-age=60")
+	}
+	w.Header().Set("Vary", "Authorization")
 	if match := r.Header.Get("If-None-Match"); match != "" && etagMatches(match, snapshot.ETag) {
 		w.WriteHeader(http.StatusNotModified)
 		return
