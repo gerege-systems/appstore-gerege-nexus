@@ -8,7 +8,7 @@ toolchain go1.26.6
 // with a longer name: the whole point of the ecosystem split is that a hundred
 // products take the same released platform, and Renovate raises this line when
 // there is a newer one.
-require github.com/gerege-systems/open-gerege-nexus/backend v1.5.0
+require github.com/gerege-systems/open-gerege-nexus/backend v1.6.0
 
 require (
 	github.com/Masterminds/semver/v3 v3.5.0

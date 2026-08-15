@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -68,39 +66,20 @@ func TestTheBundledCatalogueAgreesWithThisBinary(t *testing.T) {
 
 // loadBundledCatalogue reads catalog/apps.json and the manifests beside it.
 //
-// Assembled here rather than borrowed, because the core's loader lives in
-// `internal/` and a distribution cannot import it — which is the rule that
-// makes distributions possible at all, working exactly as intended and slightly
-// against us here. `pkg/catalog` gaining a loader would be the fix; until then
-// this is twenty lines and every one of them is the same shape as the real one.
+// One line, because the loader is in the contract package now. It was twenty
+// lines of this file's own — a second implementation of "how a catalogue is
+// read", written because the platform's lived in `internal/` and a
+// distribution cannot import that. The core's v1.6.0 moved it out, which is
+// the shape the upstream-first rule is supposed to produce: the gap was found
+// here and closed there.
 //
 // The platform version is left empty on purpose. It is stamped into the binary
-// at build time by -ldflags and lives in that same internal package, so a test
+// at build time by -ldflags and lives in that internal package, so a test
 // cannot read the real one; empty skips the compatibility constraint and leaves
 // everything this file is about — versions, manifests, visibility — checked.
 func loadBundledCatalogue(t *testing.T) ([]catalog.CatalogApp, error) {
 	t.Helper()
-	raw, err := os.ReadFile(filepath.Join("catalog", "apps.json"))
-	if err != nil {
-		return nil, err
-	}
-	var apps []catalog.CatalogApp
-	if err := json.Unmarshal(raw, &apps); err != nil {
-		return nil, err
-	}
-	for i := range apps {
-		manifestRaw, err := os.ReadFile(filepath.Join("catalog", "manifests", apps[i].Slug+".json"))
-		if err != nil {
-			return nil, err
-		}
-		if err := json.Unmarshal(manifestRaw, &apps[i].Manifest); err != nil {
-			return nil, err
-		}
-		if err := catalog.ValidateManifest(apps[i].Manifest, ""); err != nil {
-			return nil, err
-		}
-	}
-	return apps, nil
+	return catalog.LoadFile(filepath.Join("catalog", "apps.json"), "")
 }
 
 // Every app this store publishes about itself declares a visibility, and it has

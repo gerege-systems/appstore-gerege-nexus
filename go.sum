@@ -40,6 +40,8 @@ github.com/gerege-systems/open-gerege-nexus/backend v1.1.0 h1:RXR9Fi8Miq+wHfww/7
 github.com/gerege-systems/open-gerege-nexus/backend v1.1.0/go.mod h1:0Y1nX4+k7XpVeWWqLLLgQGkQGgV1AlUvGGhS2/NP+do=
 github.com/gerege-systems/open-gerege-nexus/backend v1.5.0 h1:fF3S0HqRWFjiEdcNBTN4KMrgN87nxpWaoQLQsLFQL4w=
 github.com/gerege-systems/open-gerege-nexus/backend v1.5.0/go.mod h1:3FxvTwVWDKdZe4GpzR85dCmpzWTjH7Xm7UGE1stFoPo=
+github.com/gerege-systems/open-gerege-nexus/backend v1.6.0 h1:ZY7UM/75v6WMMivq4qJPcZgoq1El+vBXDJju88uDMqE=
+github.com/gerege-systems/open-gerege-nexus/backend v1.6.0/go.mod h1:3FxvTwVWDKdZe4GpzR85dCmpzWTjH7Xm7UGE1stFoPo=
 github.com/getsentry/sentry-go v0.48.0 h1:FRZNr7Uk1C86ev1bSJmYlUkL9oyivQA6YOcdYfaaMmY=
 github.com/getsentry/sentry-go v0.48.0/go.mod h1:E5UkA5wp1qR2+MDydNYlVeUiNN2xEdjYMidkgf0Qoss=
 github.com/go-chi/chi/v5 v5.3.1 h1:3j4HZLGZQ3JpMCrPJF/Jl3mYJfWLKBfNJ6quurUGCf8=
