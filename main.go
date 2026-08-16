@@ -1,6 +1,6 @@
 /*
  * Gerege Nexus App Store
- * Copyright (c) 2026 Gerege Systems Development Team
+ * Copyright (c) 2026 Gerege Systems Development Team, Gerege Nomadica Foundation
  * Distributed under the Apache 2.0 License.
  *
  * The whole of this product's wiring.
